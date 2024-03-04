@@ -1,0 +1,41 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-api
+  title : Payment API backend service
+  description: The payment backend.
+spec:
+  lifecycle: production
+  type: service
+  domain: payment
+  system: payment-gateway
+  owner: payment-squad
+  providesApis: [payment-api-openapi]
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: payment-api-openapi
+  description: The REST API description for the Payment backend service.
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  lifecycle: production
+  type: openapi
+  domain: payment
+  system: payment-gateway
+  owner: payment-squad
+  definition:
+    $openapi: https://github.com/LionelLalande/backstage-demo-monorepo/blob/main/payment-api/openapi.yml
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: payment-api-db
+  description: The database for the Payment backend service.
+spec:
+  type: database
+  domain: payment
+  system: payment-gateway
+  owner: payment-squad
+  dependsOn: [system:mongodb]

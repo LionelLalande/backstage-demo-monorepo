@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: global-webapp
+  title : Global web application
+  description: |
+    The global web application which aggregates all micro-frontends.
+spec:
+  lifecycle: production
+  type: website
+  domain: global
+  system: webapp
+  owner: webapp-squad

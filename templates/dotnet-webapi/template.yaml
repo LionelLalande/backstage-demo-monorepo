@@ -1,0 +1,152 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: dotnet-webapi
+  title: DotNet WebApi Service
+  description: A base .Net WebApi template.
+  tags: [recommended, dotnet, webapi]
+spec:
+  type: template
+  owner: user:LionelL
+
+  parameters:
+    - title: Default information
+      required: [name]
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          pattern: "^([a-zA-Z][a-zA-Z0-9]*)(-[a-zA-Z0-9]+)*$"
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: [User, Group]
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts: ["github.com"]
+            allowedOwners: ["LionelLalande"]
+    - title: Infrastructure
+      properties:
+        cloudProvider:
+          title: Select Cloud Provider
+          type: string
+          default: none
+          enum:
+            - none
+            - aws-ecs-fargate
+            - az-container-apps
+          enumNames:
+            - None
+            - AWS ECS Fargate
+            - Azure Container Apps
+      dependencies:
+        cloudProvider:
+          allOf:
+            - if:
+                properties:
+                  cloudProvider:
+                    const: "aws-ecs-fargate"
+              then:
+                properties:
+                  Region:
+                    title: AWS Region
+                    type: string
+                    description: Name of the region where you want to create your ECS eg:- us-east-1, ap-south-1 etc.
+            - if:
+                properties:
+                  cloudProvider:
+                    const: "az-container-apps"
+              then:
+                properties:
+                  Region:
+                    title: Azure Region
+                    type: string
+                    description: Name of the region where you want to create your Container App eg:- us-east-1, ap-south-1 etc.
+
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
+      input:
+        url: ./skeleton
+        destinationPath: .
+        copyWithoutTemplating:
+          - .github/workflows/*
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+
+    - id: dotnet-update-templates
+      name: Update .Net templates
+      action: run:dotnet:new:update
+    - id: create-gitignore
+      name: Create gitignore
+      action: run:dotnet:new
+      input: { template: gitignore }
+    - id: create-sln
+      name: Create Solution
+      action: run:dotnet:new
+      input:
+        template: sln
+        args: ['-n', ${{ parameters.name | replace("-", " ") | title | replace(" ", ".") }}]
+    - id: create-webapi
+      name: Create WebApi
+      action: run:bash
+      input:
+        run: |
+          dotnet new webapi -n ${{ parameters.name | replace("-", " ") | title | replace(" ", ".") }}.WebApi -o src/WebApi
+          dotnet sln add src/WebApi
+    - id: create-webapi-tests
+      name: Create WebApi Tests
+      action: run:bash
+      input:
+        run: |
+          dotnet new xunit -n ${{ parameters.name | replace("-", " ") | title | replace(" ", ".") }}.WebApi -o tests/WebApi
+          dotnet sln add tests/WebApi
+          dotnet add src/WebApi reference tests/WebApi
+
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        allowedOwners: [LionelLalande]
+        allowMergeCommit: false
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+        repoVisibility: "public"
+        requireCodeOwnerReviews: true
+        defaultBranch: main
+        protectDefaultBranch: true
+        gitAuthorName: ${{ user.entity.metadata.name }}
+        gitAuthorEmail: ${{ user.entity.spec.profile.email }}
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: "/catalog-info.yaml"
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

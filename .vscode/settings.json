@@ -1,0 +1,9 @@
+{
+    "yaml.schemas": {
+        "file:///toc.schema.json": "/toc\\.yml/i",
+        "https://json.schemastore.org/catalog-info.json": [
+            "file:///c%3A/Users/lione/source/repos/GitHub/LionelLalande/backstage-demo-monorepo/backend-abc/catalog-info.yaml",
+            "file:///c%3A/Users/lione/source/repos/GitHub/LionelLalande/backstage-demo-monorepo/dotnet-webapi/template.yaml"
+        ]
+    }
+}

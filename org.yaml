@@ -1,0 +1,163 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: root
+spec:
+  type: root
+  profile:
+    displayName: All
+  children: [infrastructure,developers]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: infrastructure
+spec:
+  type: business-unit
+  profile:
+    displayName: Infrastructure
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: developers
+spec:
+  type: business-unit
+  profile:
+    displayName: Developers
+  children: [devex-squad,customer-squad,payment-squad,search-squad]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: devex-squad
+spec:
+  type: team
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: customer-squad
+spec:
+  type: team
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: payment-squad
+spec:
+  type: team
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: search-squad
+spec:
+  type: team
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: webapp-squad
+spec:
+  type: team
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: LionelL
+spec:
+  memberOf: [dev-squad, devex-squad]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: global
+spec:
+  owner: root
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: customers
+spec:
+  owner: customer-squad
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: payment
+spec:
+  owner: payment-squad
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: search
+spec:
+  owner: search-squad
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: customer-registration
+spec:
+  owner: customer-squad
+  domain: customers
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: customer-information
+spec:
+  owner: customer-squad
+  domain: customers
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payment-gateway
+spec:
+  owner: payment-squad
+  domain: payment
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payment-paypal
+spec:
+  owner: payment-squad
+  domain: payment
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: search
+spec:
+  owner: search-squad
+  domain: search
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: webapp
+spec:
+  owner: webapp-squad
+  domain: global
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: mongodb
+  description: The database for the Payment backend service.
+spec:
+  type: database
+  domain: global
+  owner: infrastructure

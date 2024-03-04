@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payment-webapp
+  title : Payment web application
+  description: |
+    The payment micro-frontend web application.
+spec:
+  lifecycle: production
+  type: website
+  domain: payment
+  system: payment-gateway
+  owner: payment-squad
+  consumesApis: [payment-api-openapi]
